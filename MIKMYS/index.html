@@ -1,0 +1,2350 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Ribbon</title>
+
+
+    <style>
+
+        /* ==================================================
+           BASE
+        ================================================== */
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+
+        body {
+            background: #F9F6F0; 
+            color: #2C201C; 
+        }
+
+        body.is-loading {
+            overflow: hidden !important;
+            touch-action: none;
+        }
+
+
+        /* ==================================================
+           THREE.JS — MAIN LAYER
+        ================================================== */
+
+        #scene {
+            position: fixed;
+            inset: 0;
+            z-index: 3;
+            pointer-events: none;
+        }
+
+        #html-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .about-html {
+            position: absolute;
+            top: 0;
+            left: 0;
+            will-change: transform;
+            transform-origin: 0 0;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            transform-style: preserve-3d;
+        }
+
+        #scene-front {
+            position: fixed;
+            inset: 0;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+
+        /* ==================================================
+        MODERN ABOUT / MAP
+        ================================================== */
+
+        #map-layer {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 4;
+            pointer-events: none;
+        }
+
+        .about-map {
+            position: absolute;
+            inset: 3vh 3vw;
+            width: auto;
+            height: auto;
+
+            border-radius: 32px;
+            overflow: hidden;
+
+            background: #E8E4DE;
+
+            box-shadow:
+                0 30px 80px rgba(44, 32, 28, 0.16);
+
+            pointer-events: auto;
+        }
+
+        .about-map iframe {
+            display: block;
+            width: 100%;
+            height: 100%;
+            border: 0;
+
+            filter: saturate(0.75) contrast(0.95);
+        }
+
+        /* ==================================================
+        ABOUT CARD ON MAP
+        ================================================== */
+
+        .map-about-card {
+            position: absolute;
+
+            left: 6vw;
+            top: 50%;
+            transform: translateY(-50%);
+
+            width: min(430px, 34vw);
+
+            padding: 42px;
+
+            box-sizing: border-box;
+
+            background: rgba(249, 246, 240, 0.88);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 28px;
+
+            box-shadow:
+                0 25px 70px rgba(44, 32, 28, 0.16);
+
+            z-index: 10;
+
+            pointer-events: auto;
+        }
+
+        .map-about-label {
+            display: block;
+
+            margin-bottom: 18px;
+
+            font-size: 11px;
+            letter-spacing: 0.2em;
+            font-weight: 600;
+
+            color: #8C7B73;
+        }
+
+        .map-about-card h2 {
+            margin: 0 0 24px;
+
+            font-size: clamp(42px, 4vw, 64px);
+            line-height: 0.95;
+            font-weight: 400;
+
+            color: #2C201C;
+        }
+
+        .map-about-card p {
+            max-width: 360px;
+
+            margin: 0 0 32px;
+
+            font-size: 17px;
+            line-height: 1.6;
+
+            color: #534640;
+        }
+
+        .map-about-location {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+
+            padding-top: 24px;
+            margin-bottom: 28px;
+
+            border-top: 1px solid rgba(44, 32, 28, 0.12);
+        }
+
+        .map-about-location span,
+        .map-contact-card span {
+            font-size: 10px;
+            letter-spacing: 0.16em;
+            color: #8C7B73;
+        }
+
+        .map-about-location strong {
+            font-size: 14px;
+            font-weight: 400;
+            color: #2C201C;
+        }
+
+        .map-about-button {
+            display: inline-flex;
+            align-items: center;
+
+            padding: 13px 20px;
+
+            border-radius: 999px;
+
+            background: #2C201C;
+            color: #F9F6F0;
+
+            text-decoration: none;
+
+            font-size: 14px;
+
+            transition:
+                transform 0.25s ease,
+                background 0.25s ease;
+        }
+
+        .map-about-button:hover {
+            transform: translateY(-2px);
+            background: #42322C;
+        }
+
+
+        /* ==================================================
+        CONTACT CARD
+        ================================================== */
+
+        .map-contact-card {
+            position: absolute;
+
+            right: 6vw;
+            bottom: 6vh;
+
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+
+            padding: 22px 26px;
+
+            background: rgba(249, 246, 240, 0.82);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 20px;
+
+            box-shadow:
+                0 18px 50px rgba(44, 32, 28, 0.12);
+
+            z-index: 10;
+
+            pointer-events: auto;
+        }
+
+        .map-contact-card a {
+            color: #2C201C;
+            text-decoration: none;
+
+            font-size: 14px;
+
+            transition: opacity 0.2s ease;
+        }
+
+        .map-contact-card a:hover {
+            opacity: 0.55;
+        }
+
+
+        /* ==================================================
+           MAIN CONTENT
+        ================================================== */
+
+        .content {
+            position: relative;
+        }
+
+        /* ==================================================
+            HEADER
+        ================================================== */
+
+        .site-header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            box-sizing: border-box;
+            z-index: 1000;
+            pointer-events: auto;
+        }
+
+        .logo {
+            font-size: 26px;
+            font-weight: bold;
+            color: #2C201C;
+            text-decoration: none;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+        }
+
+        .site-nav {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 35px;
+        }
+
+        .site-nav a {
+            color: #2C201C;
+            text-decoration: none;
+            font-size: 18px;
+            letter-spacing: 0.02em;
+            transition: opacity 0.2s ease;
+        }
+
+        .site-nav a:hover {
+            opacity: 0.6;
+        }
+
+        .burger-btn {
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 26px;
+            height: 18px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            z-index: 101;
+        }
+
+        .burger-btn span {
+            width: 100%;
+            height: 2px;
+            background-color: #2C201C;
+            border-radius: 2px;
+        }
+
+        .auth-buttons {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .auth-btn {
+            text-decoration: none;
+            font-size: 15px;
+            padding: 8px 18px;
+            border-radius: 50px;
+            transition: all 0.2s ease;
+        }
+
+        .auth-btn.login {
+            color: #2C201C;
+        }
+
+        .auth-btn.login:hover {
+            opacity: 0.6;
+        }
+
+        .auth-btn.signin {
+            background: #2C201C;
+            color: #F9F6F0;
+        }
+
+        .auth-btn.signin:hover {
+            background: #42322C;
+        }
+
+        /* ==================================================
+        UPDATED AUTH MODAL STYLES
+        ================================================== */
+
+        .auth-modal__window {
+            position: relative;
+            width: min(440px, calc(100vw - 32px));
+            box-sizing: border-box;
+            padding: 40px 36px;
+            background: #F3EFE6;
+            border: 1px solid rgba(44, 32, 28, 0.08);
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(44, 32, 28, 0.18);
+            transform: translateY(15px) scale(0.98);
+            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .auth-modal__label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.14em;
+            color: #8C7B73;
+        }
+
+        .auth-modal__content h2 {
+            margin: 0 0 24px;
+            font-size: 32px;
+            font-weight: 500;
+            letter-spacing: -0.02em;
+            color: #2C201C;
+        }
+
+        /* SSO / OAuth Buttons */
+        .sso-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .sso-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 11px 16px;
+            border: 1px solid rgba(44, 32, 28, 0.15);
+            border-radius: 12px;
+            background: #F9F6F0;
+            color: #2C201C;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .sso-btn:hover {
+            background: #ffffff;
+            border-color: rgba(44, 32, 28, 0.3);
+            box-shadow: 0 2px 8px rgba(44, 32, 28, 0.05);
+        }
+
+        /* Auth Divider */
+        .auth-divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .auth-divider::before,
+        .auth-divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid rgba(44, 32, 28, 0.12);
+        }
+
+        .auth-divider span {
+            padding: 0 12px;
+            font-size: 12px;
+            color: #8C7B73;
+            text-transform: lowercase;
+        }
+
+        /* Form Groups & Inputs */
+        #authForm {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            text-align: left;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #2C201C;
+        }
+
+        .form-group__header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .forgot-link {
+            font-size: 12px;
+            color: #8C7B73;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .forgot-link:hover {
+            color: #2C201C;
+            text-decoration: underline;
+        }
+
+        .password-input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        #authForm input[type="text"],
+        #authForm input[type="email"],
+        #authForm input[type="password"] {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 13px 16px;
+            border: 1px solid rgba(44, 32, 28, 0.18);
+            border-radius: 12px;
+            background: #F9F6F0;
+            color: #2C201C;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .password-input-wrapper input {
+            padding-right: 44px !important;
+        }
+
+        #authForm input:focus {
+            border-color: #2C201C;
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(44, 32, 28, 0.08);
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: #8C7B73;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s;
+        }
+
+        .toggle-password:hover {
+            color: #2C201C;
+        }
+
+        /* Terms Checkbox */
+        .form-terms {
+            margin-top: 2px;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #534640;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .checkbox-container input {
+            cursor: pointer;
+            accent-color: #2C201C;
+        }
+
+        .checkbox-container a {
+            color: #2C201C;
+            text-decoration: underline;
+        }
+
+        /* Submit Button */
+        .auth-modal__submit {
+            margin-top: 6px;
+            padding: 14px 24px;
+            border: 1px solid #2C201C;
+            border-radius: 999px;
+            background: #2C201C;
+            color: #F9F6F0;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .auth-modal__submit:hover {
+            background: #42322C;
+            border-color: #42322C;
+        }
+
+        .auth-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(44, 32, 28, 0.4);
+            backdrop-filter: blur(8px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .auth-modal.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .auth-modal.is-open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .auth-modal.is-open .auth-modal__window {
+            transform: translateY(0) scale(1);
+        }
+
+        .auth-modal__close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: transparent;
+            border: none;
+            font-size: 28px;
+            color: #8C7B73;
+            cursor: pointer;
+            line-height: 1;
+            transition: color 0.2s;
+        }
+
+        .auth-modal__close:hover {
+            color: #2C201C;
+        }
+
+        .mobile-nav-menu {
+            display: none;
+            position: fixed;
+            top: 80px;
+            left: 0;
+            width: 100%;
+            background: rgba(249, 246, 240, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 40px;
+            box-sizing: border-box;
+            border-bottom: 1px solid rgba(44, 32, 28, 0.1);
+            z-index: 99;
+        }
+
+        .mobile-nav-menu.active {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .mobile-nav-menu a {
+            color: #2C201C;
+            text-decoration: none;
+            font-size: 18px;
+        }
+
+        @media (max-width: 768px) {
+            .site-header {
+                padding: 0 20px;
+            }
+
+            .site-nav {
+                display: none;
+            }
+
+            .burger-btn {
+                display: flex;
+            }
+
+            .logo {
+                position: absolute;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+        }
+
+        /* ==================================================
+             HERO CONTENT
+        ================================================== */
+
+        .hero-content {
+            position: relative;
+            z-index: 5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .hero-title-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            position: relative;
+            z-index: 5;
+            width: 100%;
+        }
+
+        /* --------------------------------------------------
+         Create your
+        -------------------------------------------------- */
+        .hero-title {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            transform: translateY(-6vh);
+        }
+
+        .word-your {
+            font-size: 100px;
+            color: #F9F6F0;
+            line-height: 1;
+        }
+
+        .word-create {
+            position: absolute;
+            right: calc(50% + 1.5em);
+            white-space: nowrap; 
+            font-size: 100px;
+            color: #2C201C;
+            line-height: 1;
+        }
+
+        /* --------------------------------------------------
+         ideal image
+        -------------------------------------------------- */
+        .hero-title-line2 {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            translate: 15vh -5vh;
+        }
+
+        
+        .word-ideal {
+            font-size: 100px;
+            color: #F9F6F0;
+            line-height: 1;
+        }
+
+       
+        .word-image {
+            position: absolute;
+            left: calc(50% + 1.5em); 
+            white-space: nowrap; 
+            font-size: 100px;
+            color: #2C201C;
+            line-height: 1;
+        }
+
+        /* ==================================================
+            SECOND SECTION TITLE
+        ================================================== */
+
+        .services-title {
+            position: absolute;
+            top: 100px;
+            left: 56%;
+            transform: translateX(-50%);
+            margin: 0;
+            font-size: 52px;
+            font-weight: normal;
+            color: #2C201C;
+            z-index: 5;
+        }
+
+        /* ==================================================
+            THIRD SECTION TITLE
+        ================================================== */
+
+        .workers-title {
+            position: absolute;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            margin: 0;
+            font-size: 52px;
+            font-weight: normal;
+            color: #2C201C;
+            z-index: 5;
+        }
+
+        /* ==================================================
+           OBJECT LABELS
+        ================================================== */
+
+        .object-label {
+            position: absolute;
+            z-index: 5;
+            font-size: 30px;
+            font-weight: 500;
+            color: #2C201C;
+            text-decoration: none;
+            padding: 8px 18px;
+            border-radius: 50px;
+            cursor: pointer;
+            pointer-events: auto; 
+            user-select: none;
+            transition: all 0.2s ease;
+            transform: translate(-50%, -50%); 
+        }
+
+        
+        .object-label:hover {
+            opacity: 0.6;
+        }
+
+       
+        .object-label:active {
+            opacity: 0.4;
+            transform: translate(-50%, -50%) scale(0.98);
+        }
+
+        
+        .label-brush {
+            left: 34%;
+            top: 77%;
+        }
+
+        .label-scissors {
+            left: 58%;
+            top: 77%;
+        }
+
+        .label-polish {
+            left: 83%;
+            top: 77%;
+        }
+
+        /* ==================================================
+            BUTTON
+        ================================================== */
+
+        .learn-more-btn {
+            padding: 16px 35px;
+            border: 1px solid #2C201C;
+            border-radius: 50px;
+            background: transparent;
+            color: #2C201C;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .learn-more-btn:hover {
+            background: #2C201C;
+            color: #F9F6F0;
+        }
+
+        /* ==================================================
+            ABOUT US
+        ================================================== */
+
+        .about-html {
+            position: fixed;
+            width: min(680px, 48vw);
+            min-height: 510px;
+            box-sizing: border-box;
+            padding: 52px 58px;
+            background: #F4EFFA; /* Гармонирующий светлый крем */
+            background: #F3EFE6;
+            border: 1px solid rgba(44, 32, 28, 0.08);
+            border-radius: 28px;
+            box-shadow: 0 25px 70px rgba(44, 32, 28, 0.08);
+            color: #2C201C;
+            z-index: 20;
+            pointer-events: auto;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .about-html__label {
+            margin-bottom: 18px;
+            font-size: 13px;
+            letter-spacing: 0.18em;
+            color: #8C7B73;
+        }
+
+        .about-html__title {
+            margin: 0 0 24px;
+            font-size: 64px;
+            line-height: 0.95;
+            font-weight: 400;
+            color: #2C201C;
+        }
+
+        .about-html__text {
+            max-width: 500px;
+            margin: 0;
+            font-size: 20px;
+            line-height: 1.55;
+            color: #534640;
+        }
+
+        .about-html__divider {
+            width: 100%;
+            height: 1px;
+            margin: 42px 0 32px;
+            background: rgba(44, 32, 28, 0.12);
+        }
+
+        .about-html__contacts {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 38px;
+        }
+
+        .about-html__contact {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .about-html__contact span {
+            font-size: 11px;
+            letter-spacing: 0.14em;
+            color: #8C7B73;
+        }
+
+        .about-html__contact strong,
+        .about-html__contact a {
+            font-size: 16px;
+            font-weight: 400;
+            color: #2C201C;
+            text-decoration: none;
+        }
+
+        .about-html__contact a:hover {
+            text-decoration: underline;
+        }
+
+        .about-html__button {
+            align-self: flex-start;
+            padding: 15px 24px;
+            border: 1px solid #2C201C;
+            border-radius: 999px;
+            background: #2C201C;
+            color: #F9F6F0;
+            font-size: 15px;
+            cursor: pointer;
+            transition:
+                background 0.25s ease,
+                color 0.25s ease,
+                transform 0.25s ease;
+        }
+
+        .about-html__button:hover {
+            background: transparent;
+            color: #2C201C;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 800px) {
+            .about-html {
+                width: calc(100vw - 40px);
+                min-height: auto;
+                padding: 36px 30px;
+            }
+
+            .about-html__title {
+                font-size: 48px;
+            }
+
+            .about-html__text {
+                font-size: 17px;
+            }
+
+            .about-html__contacts {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+
+
+        /* ==================================================
+           SECTIONS & BACKGROUNDS
+        ================================================== */
+
+        section {
+            min-height: 100vh;
+            background: transparent;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #hero {
+            background: #F9F6F0;
+        }
+
+        #ribbon-1 {
+            position: relative;
+            background: #F9F6F0;
+        }
+
+        #ribbon-2 {
+            position: relative;
+            background: #F9F6F0;
+            align-items: flex-start;
+            padding-top: 250px;
+            box-sizing: border-box;
+        }
+
+        #ribbon-3 {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #F9F6F0;
+            overflow: hidden;
+        }
+
+
+        /* ==================================================
+            TEAM CAROUSEL
+        ================================================== */
+
+        .workers-carousel {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 50px;
+        }
+
+        .workers-window {
+            width: 900px;
+            overflow: hidden;
+        }
+
+        .workers-track {
+            display: flex;
+            gap: 20px;
+            transition: transform 0.5s ease;
+        }
+
+        .worker-card {
+            flex: 0 0 286px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            background: transparent;
+            border: none;
+            padding: 0 15px;
+        }
+
+        .worker-photo {
+            width: 210px;
+            height: 280px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-bottom: 28px;
+            box-shadow: 0 10px 30px rgba(44, 32, 28, 0.1);
+        }
+
+        .worker-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .worker-card h2 {
+            margin: 0 0 12px;
+            font-size: 30px;
+            font-weight: normal;
+            color: #2C201C;
+        }
+
+        .worker-card h3 {
+            margin: 0 0 10px;
+            font-size: 19px;
+            font-weight: normal;
+            color: #534640;
+        }
+
+        .worker-card p {
+            margin: 0;
+            font-size: 17px;
+            line-height: 1.5;
+            color: #7A6B63;
+        }
+
+
+        .carousel-btn {
+            position: relative;
+            width: 64px;
+            height: 64px;
+            flex-shrink: 0;
+            border: 1px solid rgba(44, 32, 28, 0.18);
+            border-radius: 50%;
+            background: rgba(249, 246, 240, 0.6);
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+            transition:
+                transform 0.3s ease,
+                background 0.3s ease,
+                border-color 0.3s ease;
+            font-size: 0;
+        }
+
+        .carousel-btn:hover {
+            transform: scale(1.08);
+            background: #F9F6F0;
+            border-color: #2C201C;
+        }
+
+        .carousel-btn::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 13px;
+            height: 13px;
+            border-top: 1.5px solid #2C201C;
+            border-right: 1.5px solid #2C201C;
+        }
+
+        .carousel-btn.next::before {
+            transform: translate(-65%, -50%) rotate(45deg);
+        }
+
+        .carousel-btn.prev::before {
+            transform: translate(-35%, -50%) rotate(-135deg);
+        }
+
+
+        /* ==================================================
+            MODERN FOOTER
+        ================================================== */
+
+        .site-footer {
+            background: #221815;
+            color: #F9F6F0;
+
+            padding: 90px 6vw 28px;
+
+            box-sizing: border-box;
+        }
+
+
+        /* ==================================================
+            MAIN
+        ================================================== */
+
+        .footer-main {
+            max-width: 1400px;
+
+            margin: 0 auto;
+
+            display: flex;
+            justify-content: space-between;
+
+            gap: 80px;
+        }
+
+
+        /* ==================================================
+            LEFT / HEADING
+        ================================================== */
+
+        .footer-heading {
+            max-width: 700px;
+        }
+
+        .footer-label {
+            display: block;
+
+            margin-bottom: 28px;
+
+            font-size: 11px;
+            letter-spacing: 0.2em;
+
+            color: #A89B93;
+        }
+
+        .footer-heading h2 {
+            margin: 0 0 40px;
+
+            font-size: clamp(48px, 6vw, 88px);
+            line-height: 0.95;
+            font-weight: 400;
+
+            letter-spacing: -0.03em;
+
+            color: #F9F6F0;
+        }
+
+
+        /* ==================================================
+            CTA
+        ================================================== */
+
+        .footer-cta {
+            display: inline-flex;
+            align-items: center;
+
+            padding: 15px 23px;
+
+            border: 1px solid rgba(249, 246, 240, 0.4);
+            border-radius: 999px;
+
+            color: #F9F6F0;
+            text-decoration: none;
+
+            font-size: 14px;
+
+            transition:
+                background 0.25s ease,
+                color 0.25s ease,
+                transform 0.25s ease;
+        }
+
+        .footer-cta:hover {
+            background: #F9F6F0;
+            color: #221815;
+
+            transform: translateY(-2px);
+        }
+
+
+        /* ==================================================
+            NAVIGATION
+        ================================================== */
+
+        .footer-navigation {
+            display: flex;
+
+            gap: 90px;
+
+            padding-top: 42px;
+        }
+
+
+        .footer-column {
+            display: flex;
+            flex-direction: column;
+
+            gap: 12px;
+
+            min-width: 150px;
+        }
+
+
+        .footer-column-title {
+            margin-bottom: 12px;
+
+            font-size: 10px;
+            letter-spacing: 0.17em;
+
+            color: #8C7B73;
+        }
+
+
+        .footer-column a,
+        .footer-location {
+            color: #C9C0BA;
+
+            text-decoration: none;
+
+            font-size: 14px;
+            line-height: 1.5;
+
+            transition: color 0.2s ease;
+        }
+
+
+        .footer-column a:hover {
+            color: #F9F6F0;
+        }
+
+
+        .footer-location {
+            margin-top: 8px;
+
+            color: #8C7B73;
+        }
+
+
+        /* ==================================================
+            BOTTOM
+        ================================================== */
+
+        .footer-bottom {
+            max-width: 1400px;
+
+            margin: 90px auto 0;
+
+            padding-top: 22px;
+
+            border-top: 1px solid #382A25;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            color: #8C7B73;
+
+            font-size: 12px;
+        }
+
+
+        .footer-legal {
+            display: flex;
+
+            gap: 25px;
+        }
+
+
+        .footer-legal a {
+            color: #8C7B73;
+
+            text-decoration: none;
+
+            transition: color 0.2s ease;
+        }
+
+
+        .footer-legal a:hover {
+            color: #F9F6F0;
+        }
+
+
+        /* ==================================================
+            MOBILE
+        ================================================== */
+
+        @media (max-width: 768px) {
+
+            .site-footer {
+                padding: 65px 24px 25px;
+            }
+
+
+            .footer-main {
+                display: flex;
+                flex-direction: column;
+
+                gap: 55px;
+            }
+
+
+            .footer-heading {
+                max-width: none;
+            }
+
+
+            .footer-label {
+                margin-bottom: 22px;
+
+                font-size: 10px;
+            }
+
+
+            .footer-heading h2 {
+                margin-bottom: 30px;
+
+                font-size: 48px;
+                line-height: 0.95;
+            }
+
+
+            .footer-cta {
+                font-size: 13px;
+
+                padding: 13px 20px;
+            }
+
+
+            .footer-navigation {
+                display: grid;
+
+                grid-template-columns: 1fr 1fr;
+
+                gap: 40px;
+
+                padding-top: 0;
+            }
+
+
+            .footer-column {
+                min-width: 0;
+            }
+
+
+            .footer-column-title {
+                font-size: 9px;
+            }
+
+
+            .footer-column a,
+            .footer-location {
+                font-size: 13px;
+            }
+
+
+            .footer-bottom {
+                margin-top: 55px;
+
+                padding-top: 20px;
+
+                display: flex;
+                flex-direction: column;
+
+                align-items: flex-start;
+
+                gap: 16px;
+
+                font-size: 11px;
+            }
+
+
+            .footer-legal {
+                gap: 20px;
+            }
+
+        }
+
+       /* ==================================================
+            MOBILE HERO TITLE
+        ================================================== */
+
+        @media (max-width: 768px) {
+
+            #hero {
+                position: relative;
+            }
+
+            .hero-title-container {
+                position: absolute;
+                inset: 0;
+                width: 100%;
+                height: 100%;
+                display: block;
+                padding: 0;
+                margin: 0;
+                transform: none !important;
+                z-index: 10;
+                pointer-events: none;
+            }
+
+            .hero-title,
+            .hero-title-line2 {
+                position: static !important;
+                display: block !important;
+                width: 100%;
+                height: 100%;
+                transform: none !important;
+                translate: none !important;
+            }
+
+            .word-create,
+            .word-your {
+                display: none !important;
+            }
+
+            /* =========================
+             IDEAL
+            ========================= */
+
+            .word-ideal {
+                position: absolute !important;
+                left: 15vw;
+                top: 15%;
+                font-size: 40vw !important;
+                line-height: 1 !important;
+
+                color: transparent !important;
+                -webkit-text-fill-color: transparent !important;
+
+                background-image: linear-gradient(
+                    120deg,
+                    #5a453b 0%,
+                    #8c7365 30%,
+                    #ffffff 50%,
+                    #d1c3b7 75%,
+                    #211c19 100%
+                ) !important;
+
+                -webkit-background-clip: text !important;
+                background-clip: text !important;
+
+                filter: drop-shadow(0px 4px 12px rgba(33, 28, 25, 0.25)) !important;
+
+                white-space: nowrap;
+                margin: 0 !important;
+                transform: none !important;
+                translate: none !important;
+            }
+
+            /* =========================
+             LOOK
+            ========================= */
+
+            .word-image {
+                position: absolute !important;
+                left: 20vw;
+                top: 50%;
+                font-size: 0 !important;
+                line-height: 0 !important;
+                margin: 0 !important;
+                transform: none !important;
+                translate: none !important;
+            }
+
+            .word-image::after {
+                content: "look";
+                display: inline-block;
+                font-size: 40vw !important;
+                line-height: 1 !important;
+
+                color: transparent !important;
+                -webkit-text-fill-color: transparent !important;
+
+                background-image: linear-gradient(
+                    95deg,
+                    #211c19 0%,
+                    #d1c3b7 25%,
+                    #ffffff 50%,
+                    #8c7365 70%,
+                    #3b2d27 100%
+                ) !important;
+
+                -webkit-background-clip: text !important;
+                background-clip: text !important;
+
+                filter: drop-shadow(0px 4px 12px rgba(0, 0, 0, 0.3)) !important;
+
+                white-space: nowrap;
+            }
+        }
+
+        /* ==================================================
+        MOBILE — SECOND SECTION
+        WHAT WE PROVIDE
+        ================================================== */
+
+        @media (max-width: 768px) {
+
+            #ribbon-1 {
+                position: relative;
+                min-height: 100vh;
+                height: 100vh;
+
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+
+                padding: 0;
+                box-sizing: border-box;
+
+                overflow: hidden;
+            }
+
+
+            /* ============================================
+            TITLE
+            ============================================ */
+
+            #ribbon-1 .services-title {
+                position: absolute;
+
+                top: 80px;
+                left: 50%;
+
+                transform: translateX(-50%);
+
+                width: 100%;
+
+                margin: 0;
+
+                text-align: center;
+
+                font-size: 34px;
+                line-height: 1.1;
+                font-weight: 400;
+
+                color: #2C201C;
+
+                z-index: 10;
+            }
+
+
+            /* ============================================
+            OBJECT LABELS
+            ============================================ */
+
+            #ribbon-1 .object-label {
+                position: absolute;
+
+                transform: translateX(-50%);
+
+                width: 100%;
+
+                text-align: center;
+
+                font-size: 24px;
+                line-height: 1.2;
+
+                color: #2C201C;
+
+                z-index: 10;
+            }
+
+
+            /* ============================================
+            BRUSH
+            ============================================ */
+
+            #ribbon-1 .label-brush {
+                top: 40%;
+                left: 40%;
+            }
+
+
+            /* ============================================
+            NAIL POLISH
+            ============================================ */
+
+            #ribbon-1 .label-polish {
+                top: 91%;
+                left: 55%;
+            }
+
+
+            /* ============================================
+            SCISSORS
+            ============================================ */
+
+            #ribbon-1 .label-scissors {
+                top: 59%;
+                left: 75%;
+            }
+        }
+
+        /* ==================================================
+        MOBILE — WORKERS CAROUSEL
+        ================================================== */
+
+        @media (max-width: 768px) {
+
+            #ribbon-2 {
+                min-height: 100vh;
+                height: 100vh;
+                padding-top: 0;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                overflow: hidden;
+                box-sizing: border-box;
+            }
+
+            #ribbon-2 .workers-title {
+                position: absolute;
+                top: 140px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 100%;
+                margin: 0;
+                text-align: center;
+                font-size: 34px;
+                line-height: 1.1;
+                font-weight: 400;
+                z-index: 10;
+                
+            }
+
+            #ribbon-2 .workers-carousel {
+                width: 100%;
+                max-width: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 8px;
+                padding: 0 10px;
+                box-sizing: border-box;
+                transform: translateY(80px);
+            }
+
+            #ribbon-2 .workers-window {
+                width: calc(100vw - 100px);
+                max-width: 360px;
+                overflow: hidden;
+                flex: 1;
+            }
+
+            #ribbon-2 .workers-track {
+                display: flex;
+                gap: 0;
+                transition: transform 0.45s ease;
+                touch-action: pan-y;
+                will-change: transform;
+            }
+
+            #ribbon-2 .worker-card {
+                flex: 0 0 100%;
+                width: 100%;
+                min-width: 100%;
+                box-sizing: border-box;
+                padding: 0 10px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+            #ribbon-2 .worker-photo {
+                width: 190px;
+                height: 250px;
+                flex-shrink: 0;
+                border-radius: 50%;
+                overflow: hidden;
+                margin-bottom: 22px;
+                box-shadow: 0 10px 30px rgba(44, 32, 28, 0.1);
+            }
+
+            #ribbon-2 .worker-photo img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                display: block;
+            }
+
+            #ribbon-2 .worker-card h2 {
+                margin: 0 0 8px;
+                font-size: 26px;
+                line-height: 1.15;
+                font-weight: 400;
+            }
+
+            #ribbon-2 .worker-card h3 {
+                margin: 0 0 8px;
+                font-size: 17px;
+                line-height: 1.3;
+                font-weight: 400;
+            }
+
+            #ribbon-2 .worker-card p {
+                max-width: 280px;
+                margin: 0;
+                font-size: 15px;
+                line-height: 1.45;
+            }
+
+            #ribbon-2 .portfolio-link {
+                margin-top: 16px;
+                font-size: 14px;
+            }
+
+            #ribbon-2 .carousel-btn {
+                width: 46px;
+                height: 46px;
+                flex: 0 0 46px;
+                padding: 0;
+            }
+
+            #ribbon-2 .carousel-btn::before {
+                width: 10px;
+                height: 10px;
+            }
+
+            @media (max-width: 380px) {
+
+                #ribbon-2 .workers-window {
+                    width: calc(100vw - 86px);
+                }
+
+                #ribbon-2 .worker-photo {
+                    width: 165px;
+                    height: 220px;
+                    margin-bottom: 18px;
+                }
+
+                #ribbon-2 .worker-card h2 {
+                    font-size: 23px;
+                }
+
+                #ribbon-2 .worker-card h3 {
+                    font-size: 16px;
+                }
+
+                #ribbon-2 .worker-card p {
+                    font-size: 14px;
+                    max-width: 240px;
+                }
+
+                #ribbon-2 .carousel-btn {
+                    width: 40px;
+                    height: 40px;
+                    flex-basis: 40px;
+                }
+            }
+        }
+
+        @media (max-width: 768px) {
+
+            #ribbon-3 {
+                min-height: 100vh;
+                height: 100vh;
+            }
+
+            #map-layer {
+                position: absolute;
+                inset: 0;
+            }
+
+            .about-map {
+                inset: 14px;
+                border-radius: 24px;
+            }
+
+            .map-about-card {
+                left: 28px;
+                right: 28px;
+                bottom: 28px;
+                top: auto;
+
+                width: auto;
+
+                padding: 26px;
+
+                transform: none;
+
+                border-radius: 22px;
+            }
+
+            .map-about-card h2 {
+                font-size: 38px;
+                margin-bottom: 16px;
+            }
+
+            .map-about-card p {
+                font-size: 14px;
+                line-height: 1.5;
+                margin-bottom: 20px;
+            }
+
+            .map-about-location {
+                padding-top: 16px;
+                margin-bottom: 18px;
+            }
+
+            .map-contact-card {
+                display: none;
+            }
+
+            .map-about-button {
+                width: 100%;
+                justify-content: center;
+                box-sizing: border-box;
+            }
+        }
+
+        
+    </style>
+
+
+    <!-- ==================================================
+         THREE.JS IMPORT MAP
+    ================================================== -->
+
+    <script type="importmap">
+
+    {
+        "imports": {
+
+            "three":
+                "https://cdn.jsdelivr.net/npm/three@0.180/build/three.module.js",
+
+            "three/addons/":
+                "https://cdn.jsdelivr.net/npm/three@0.180/examples/jsm/"
+
+        }
+    }
+
+    </script>
+
+</head>
+
+
+<body class="is-loading">
+
+    <!-- ==================================================
+         THREE.JS
+    ================================================== -->
+    <div id="scene"></div>
+    <div id="html-layer"></div>
+    <div id="scene-front"></div>
+
+    <!-- ==================================================
+         MAIN CONTENT
+    ================================================== -->
+
+    <main class="content">
+
+
+        <!-- ==================================================
+             FIRST SLIDE
+        ================================================== -->
+
+        <section id="hero">
+           <!-- =============================================
+                HEADER
+            ============================================== -->
+            <header class="site-header">
+
+                <button class="burger-btn" id="burgerBtn" aria-label="Menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+
+                <a href="#hero" class="logo">
+                    Mikmys
+                </a>
+
+                <nav class="site-nav">
+                    <a href="#ribbon-1">About Us</a>
+                    <a href="#ribbon-2">Our Team</a>
+                    <a href="#ribbon-3">Contacts</a>
+                    <a href="coming-soon.html">Personal Account</a>
+                </nav>
+
+                <div class="auth-buttons">
+                    <a href="#login" class="auth-btn login" id="loginBtn">Log In</a>
+                    <a href="#signin" class="auth-btn signin" id="signinBtn">Sign In</a>
+                </div>
+
+            </header>
+
+            <nav class="mobile-nav-menu" id="mobileMenu">
+                <a href="#ribbon-1">About Us</a>
+                <a href="#ribbon-2">Our Team</a>
+                <a href="#ribbon-3">Contacts</a>
+                <a href="coming-soon.html">Personal Account</a>
+            </nav>
+
+            <!-- ==================================================
+                 AUTH MODAL
+            ================================================== -->
+            <div class="auth-modal" id="authModal">
+                <div class="auth-modal__window" id="authModalWindow">
+                    
+                    <button class="auth-modal__close" id="authModalClose" aria-label="Close modal">&times;</button>
+
+                    <div class="auth-modal__content">
+                        <span class="auth-modal__label" id="authModalLabel">WELCOME BACK</span>
+                        <h2 id="authModalTitle">Log In</h2>
+
+                        <!-- SSO buttons -->
+                        <div class="sso-buttons">
+                            <button type="button" class="sso-btn">
+                                <svg width="18" height="18" viewBox="0 0 24 24">
+                                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                                </svg>
+                                Continue with Google
+                            </button>
+                            <button type="button" class="sso-btn">
+                                <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.85c.66-.8 1.12-1.92.99-3.05-.97.04-2.15.65-2.85 1.47-.62.72-1.16 1.87-1.01 2.98 1.08.08 2.21-.59 2.87-1.4z"/>
+                                </svg>
+                                Continue with Apple
+                            </button>
+                        </div>
+
+                        <div class="auth-divider">
+                            <span>or email</span>
+                        </div>
+
+                        <form id="authForm" novalidate>
+                            <div class="form-group signup-only" style="display: none;">
+                                <label for="fullName">Full Name</label>
+                                <input type="text" id="fullName" placeholder="Jane Doe">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="email">Email address</label>
+                                <input type="email" id="email" placeholder="name@company.com" required>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="form-group__header">
+                                    <label for="password">Password</label>
+                                    <a href="#forgot" class="forgot-link login-only">Forgot?</a>
+                                </div>
+                                <div class="password-input-wrapper">
+                                    <input type="password" id="password" placeholder="••••••••" required>
+                                    <button type="button" class="toggle-password" aria-label="Toggle password visibility">
+                                        <svg class="eye-icon" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                            <circle cx="12" cy="12" r="3"></circle>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="form-terms signup-only" style="display: none;">
+                                <label class="checkbox-container">
+                                    <input type="checkbox" id="termsCheckbox">
+                                    <span class="checkmark"></span>
+                                    <span class="terms-text">I agree to the <a href="#">Terms</a> and <a href="#">Privacy Policy</a></span>
+                                </label>
+                            </div>
+
+                            <button type="submit" class="auth-modal__submit">
+                                <span class="btn-text">Continue</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hero-title-container">
+                <div class="hero-title">
+                    <span class="word-create">Create</span>
+                    <span class="word-your">your</span>
+                </div>
+
+                <div class="hero-title-line2">
+                    <span class="word-ideal">Ideal</span>
+                    <span class="word-image">image</span>
+                </div>
+            </div>
+
+            
+        </section>
+
+        <!-- ==================================================
+             SECOND SLIDE
+        ================================================== -->
+
+        <section id="ribbon-1">
+
+            <h2 class="services-title">
+                Our Services
+            </h2>
+
+            <a class="object-label label-brush" href="coming-soon.html#ribbon-1">
+                Visage & Makeup
+            </a>
+
+            <a class="object-label label-scissors" href="coming-soon.html#ribbon-1">
+                Hair & Styling
+            </a>
+
+            <a class="object-label label-polish" href="coming-soon.html#ribbon-1">
+                Nail Care & Art
+            </a>
+
+        </section>
+
+
+
+        <!-- ==================================================
+             THIRD SLIDE — TEAM
+        ================================================== -->
+
+        <section id="ribbon-2">
+
+            <h2 class="workers-title">
+                Our Team
+            </h2>
+
+            <div class="workers-carousel">
+
+                <button class="carousel-btn prev" type="button">
+                    ←
+                </button>
+
+                <div class="workers-window">
+
+                    <div class="workers-track">
+
+                        <div class="worker-card">
+                            <div class="worker-photo">
+                                <img src="./images/photo3.png" alt="Emma Miller">
+                            </div>
+
+                            <h2>
+                                Emma Miller
+                            </h2>
+
+                            <h3>
+                                Nail Artist
+                            </h3>
+
+                            <p>
+                                Experience: 5 years
+                            </p>
+
+                            <a href="coming-soon.html#ribbon-2" class="portfolio-link">View Portfolio</a>
+                        </div>
+
+                        <div class="worker-card">
+                            <div class="worker-photo">
+                                <img src="./images/photo4.png" alt="Oliver Smith">
+                            </div>
+
+                            <h2>
+                                Oliver Smith
+                            </h2>
+
+                            <h3>
+                                Barber / Hair Stylist
+                            </h3>
+
+                            <p>
+                                Specializes in modern haircuts and beard styling.
+                            </p>
+
+                            <a href="coming-soon.html#ribbon-2" class="portfolio-link">View Portfolio</a>
+                        </div>
+
+                        <div class="worker-card">
+                            <div class="worker-photo">
+                                <img src="./images/photo5.png" alt="Sophia Brown">
+                            </div>
+
+                            <h2>
+                                Sophia Brown
+                            </h2>
+
+                            <h3>
+                                Makeup Artist
+                            </h3>
+
+                            <p>
+                                Creates professional makeup for events and photoshoots.
+                            </p>
+
+                            <a href="coming-soon.html#ribbon-2" class="portfolio-link">View Portfolio</a>
+                        </div>
+
+                        <div class="worker-card">
+                            <div class="worker-photo">
+                                <img src="./images/photo6.png" alt="Chloe Davis">
+                            </div>
+
+                            <h2>
+                                Chloe Davis
+                            </h2>
+
+                            <h3>
+                                Hair Stylist
+                            </h3>
+
+                            <p>
+                                Specializes in professional hair drying, styling, and hair care treatments.
+                            </p>
+
+                            <a href="coming-soon.html#ribbon-2" class="portfolio-link">View Portfolio</a>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <button class="carousel-btn next" type="button">
+                    →
+                </button>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ==================================================
+             FOURTH SLIDE
+        ================================================== -->
+
+        <section id="ribbon-3">
+
+             <!-- ==================================================
+                GOOGLE MAPS
+            ================================================== -->
+
+            <div id="map-layer">
+
+                <div class="about-map">
+                    <iframe
+                        src="https://maps.google.com/maps?q=New%20York&z=12&hl=en&output=embed"
+                        loading="lazy"
+                        allowfullscreen
+                        referrerpolicy="no-referrer-when-downgrade">
+                    </iframe>
+                </div>
+
+                <div class="map-about-card">
+
+                    <span class="map-about-label">ABOUT US</span>
+
+                    <h2>
+                        Beauty,<br>
+                        reimagined.
+                    </h2>
+
+                    <p>
+                        We create thoughtful beauty experiences
+                        for people who value individuality,
+                        creativity and modern style.
+                    </p>
+
+                    <div class="map-about-location">
+                        <span>BASED IN</span>
+                        <strong>New York · London · Paris</strong>
+                    </div>
+
+                    <a href="mailto:hello@mikmys.com" class="map-about-button">
+                        Get in touch →
+                    </a>
+
+                </div>
+
+                <div class="map-contact-card">
+
+                    <span>CONTACT</span>
+
+                    <a href="tel:+12125550187">
+                        +1 (212) 555-0187
+                    </a>
+
+                    <a href="mailto:hello@mikmys.com">
+                        hello@mikmys.com
+                    </a>
+
+                </div>
+
+            </div>
+        </section>
+
+
+    </main>
+
+
+
+    <!-- ==================================================
+         FOOTER
+    ================================================== -->
+
+    
+    <footer class="site-footer">
+
+        <div class="footer-main">
+
+            <div class="footer-heading">
+                <span class="footer-label">MIKMYS</span>
+
+                <h2>
+                    Let's create<br>
+                    something beautiful.
+                </h2>
+
+                <a href="mailto:hello@mikmys.com" class="footer-cta">
+                    Get in touch →
+                </a>
+            </div>
+
+
+            <div class="footer-navigation">
+
+                <div class="footer-column">
+                    <span class="footer-column-title">NAVIGATION</span>
+
+                    <a href="#hero">Home</a>
+                    <a href="#ribbon-1">About Us</a>
+                    <a href="#ribbon-2">Our Team</a>
+                    <a href="#ribbon-3">Contacts</a>
+                </div>
+
+
+                <div class="footer-column">
+                    <span class="footer-column-title">CONTACT</span>
+
+                    <a href="tel:+12125550187">
+                        +1 (212) 555-0187
+                    </a>
+
+                    <a href="mailto:hello@mikmys.com">
+                        hello@mikmys.com
+                    </a>
+
+                    <span class="footer-location">
+                        New York · London · Paris
+                    </span>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="footer-bottom">
+
+            <span>© 2026 Mikmys. All rights reserved.</span>
+
+            <div class="footer-legal">
+                <a href="coming-soon.html">Privacy</a>
+                <a href="coming-soon.html">Terms</a>
+            </div>
+
+        </div>
+
+    </footer>
+
+
+
+
+
+    <!-- ==================================================
+         MAIN.JS
+    ================================================== -->
+
+    <script
+        type="module"
+        src="./main.js">
+    </script>
+
+
+</body>
+
+</html>
