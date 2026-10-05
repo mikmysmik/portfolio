@@ -55,8 +55,8 @@ export function createScissors({
     };
 
     const mobilePosition = {
-        x: 2,
-        y: -0.6,
+        x: -0.8,
+        y: -0.5,
         z: 2
     };
 
@@ -87,7 +87,7 @@ export function createScissors({
     // ============================================
 
     const desktopScale = 0.4;
-    const mobileScale = 0.25;
+    const mobileScale = 0.195;
 
     function updateResponsiveScale() {
         if (!scissors) return;

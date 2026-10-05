@@ -70,14 +70,14 @@ const transformDesktop = {
 
 const transformMobile = {
     scale: {
-        x: 1.8,
+        x: 2,
         y: 2,
-        z: 2.2
+        z: 1.8
     },
 
     offset: {
-        x: 1.5,
-        y: -2,
+        x: 2.7,
+        y: -2.5,
         z: 2
     }
 };

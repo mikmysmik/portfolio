@@ -58,7 +58,7 @@ export function createBrush({
 
     
     const mobilePosition = {
-        x: -1.3,
+        x: 0.5,
         y: 0.6,
         z: 2
     };
@@ -90,7 +90,7 @@ export function createBrush({
     // ============================================
 
     const desktopScale = 0.55;
-    const mobileScale = 0.29;
+    const mobileScale = 0.25;
 
     function updateResponsiveScale() {
         if (!brush) return;

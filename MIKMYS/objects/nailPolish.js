@@ -54,8 +54,8 @@ export function createNailPolish({
     };
 
     const mobilePosition = {
-        x: 0.3,
-        y: -3.5,
+        x: 1,
+        y: -2,
         z: 2
     };
 
@@ -85,7 +85,7 @@ export function createNailPolish({
     // ============================================
 
     const desktopScale = 0.35;
-    const mobileScale = 0.2;
+    const mobileScale = 0.15;
 
     function updateResponsiveScale() {
         if (!nailPolish) return;
